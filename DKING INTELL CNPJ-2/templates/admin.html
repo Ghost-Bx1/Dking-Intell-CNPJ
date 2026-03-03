@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DKing Intel · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#040810;--surface:#07101f;--card:#0c1525;--card2:#0e1a2f;
+  --border:#0e2040;--border2:#122848;
+  --accent:#00c6ff;--accent2:#0072ff;--green:#00e5a0;
+  --orange:#ffaa00;--red:#ff3c5c;--purple:#9b72ff;
+  --text:#e8f0fe;--text2:#a0b8d8;--muted:#4a6080;
+  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+#app{display:flex;height:100vh}
+.sidebar{width:200px;min-width:200px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar-logo{padding:16px;border-bottom:1px solid var(--border)}
+.logo-row{display:flex;align-items:center;gap:8px}
+.logo-box{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center}
+.logo-box svg{width:16px;height:16px;fill:#fff}
+.logo-text{font-size:14px;font-weight:800;background:linear-gradient(90deg,var(--accent),#fff 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav{flex:1;padding:10px 8px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:.15s;margin-bottom:2px}
+.nav-item svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+.nav-item:hover{background:rgba(0,198,255,.07);color:var(--text)}
+.nav-item.active{background:rgba(0,198,255,.12);color:var(--accent)}
+.nav-back{padding:12px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;min-height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px}
+.topbar-title{font-size:14px;font-weight:700;flex:1}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border2)}
+.panel{display:none}.panel.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:1000px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-num{font-size:28px;font-weight:800;margin-bottom:4px}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.rcard-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--card2)}
+th{padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;color:var(--text2);border-bottom:1px solid rgba(14,32,64,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700;transition:.15s}
+.btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#fff}
+.btn-primary:hover{box-shadow:0 4px 14px rgba(0,198,255,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-danger{background:rgba(255,60,92,.1);color:var(--red);border:1px solid rgba(255,60,92,.2)}
+.btn-danger:hover{background:rgba(255,60,92,.18)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:600}
+.badge-green{background:rgba(0,229,160,.12);color:var(--green)}
+.badge-red{background:rgba(255,60,92,.12);color:var(--red)}
+.badge-orange{background:rgba(255,170,0,.12);color:var(--orange)}
+.badge-blue{background:rgba(0,198,255,.1);color:var(--accent)}
+.badge-purple{background:rgba(155,114,255,.1);color:var(--purple)}
+.search-input{width:100%;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:.2s}
+.search-input:focus{border-color:var(--accent)}
+.flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-wrap{flex-wrap:wrap}
+.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mt-3{margin-top:12px}
+.text-sm{font-size:12px}.text-xs{font-family:var(--mono);font-size:10px}.text-muted{color:var(--muted)}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;z-index:999;background:rgba(4,8,16,.85);align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:420px;max-width:95vw}
+.modal-title{font-size:14px;font-weight:700;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:.2s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--card)}
+#toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:8px;font-family:var(--mono);font-size:12px;display:none}
+#toast.success{background:#081f14;border:1px solid rgba(0,229,160,.3);color:var(--green)}
+#toast.error{background:#1a080e;border:1px solid rgba(255,60,92,.3);color:var(--red)}
+#toast.info{background:#080f1f;border:1px solid rgba(0,198,255,.3);color:var(--accent)}
+.spinner{width:28px;height:28px;border:2px solid rgba(0,198,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.admin-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:9px;background:rgba(155,114,255,.12);color:var(--purple);border:1px solid rgba(155,114,255,.2)}
+</style>
+</head>
+<body>
+<div id="app">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-box"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><div class="logo-text">Admin</div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPanel('stats')">
+      <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Dashboard
+    </div>
+    <div class="nav-item" onclick="showPanel('users')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Usuários
+    </div>
+    <div class="nav-item" onclick="showPanel('audit')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Auditoria
+    </div>
+    <div class="nav-item" onclick="clearCache()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>Limpar Cache
+    </div>
+  </nav>
+  <div class="nav-back">
+    <div class="nav-item" onclick="location.href='/'">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Voltar ao App
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard Admin</div>
+    <span class="admin-badge">⚙ ADMIN</span>
+    <span class="text-xs text-muted" id="topbar-time"></span>
+  </div>
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="panel active" id="panel-stats">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="spinner"></div></div>
+      </div>
+      <div id="stats-extra"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div class="flex justify-between items-center mb-4">
+        <div style="font-size:14px;font-weight:700">Gestão de Usuários</div>
+        <button class="btn btn-primary btn-sm" onclick="openNewUserModal()">+ Novo Usuário</button>
+      </div>
+      <div id="users-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="panel" id="panel-audit">
+      <div class="flex justify-between items-center mb-4">
+        <div style="font-size:14px;font-weight:700">Log de Auditoria</div>
+        <div class="flex gap-2">
+          <input class="search-input" id="audit-filter" placeholder="Filtrar ação…" style="width:160px" oninput="filterAudit()">
+          <button class="btn btn-ghost btn-sm" onclick="loadAudit()">↻</button>
+        </div>
+      </div>
+      <div id="audit-list"><div class="spinner"></div></div>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs text-muted" id="audit-count"></span>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm" id="audit-prev" onclick="auditPage--; loadAudit()">← Ant</button>
+          <button class="btn btn-ghost btn-sm" id="audit-next" onclick="auditPage++; loadAudit()">Próx →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- New/Edit User Modal -->
+<div class="modal-bg" id="user-modal" onclick="if(event.target===this)closeUserModal()">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Novo Usuário</div>
+    <input type="hidden" id="edit-uid">
+    <div class="field">
+      <label>Usuário</label>
+      <input id="u-username" type="text" placeholder="username">
+    </div>
+    <div class="field">
+      <label>E-mail</label>
+      <input id="u-email" type="email" placeholder="email@empresa.com">
+    </div>
+    <div class="field">
+      <label>Senha <span id="pw-hint" style="color:var(--muted)">(deixe vazio para não alterar)</span></label>
+      <input id="u-password" type="password" placeholder="Min 8 chars, 1 maiúscula, 1 número">
+    </div>
+    <div class="field">
+      <label>Papel</label>
+      <select id="u-role">
+        <option value="user">Usuário</option>
+        <option value="operator">Operador</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div class="flex gap-2 justify-between mt-3">
+      <button class="btn btn-ghost" onclick="closeUserModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUser()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let auditPage = 1;
+let allAuditData = [];
+let toastTimer = null;
+
+(async()=>{
+  setInterval(updateTime,1000); updateTime();
+  await loadStats();
+})();
+
+function updateTime(){
+  document.getElementById('topbar-time').textContent =
+    new Date().toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  const titles = {stats:'Dashboard Admin',users:'Gestão de Usuários',audit:'Log de Auditoria'};
+  document.getElementById('topbar-title').textContent = titles[id]||id;
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))
+      n.classList.add('active');
+  });
+  if(id==='users') loadUsers();
+  if(id==='audit') loadAudit();
+}
+
+/* ── STATS ── */
+async function loadStats(){
+  try{
+    const r = await fetch('/api/admin/stats');
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      const s = d.data;
+      document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-num" style="background:linear-gradient(90deg,var(--accent),#fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${s.total_users}</div>
+          <div class="stat-label">Total de Usuários</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">${s.active_users} ativos · ${s.locked_users} bloqueados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="background:linear-gradient(90deg,var(--green),#fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${s.total_queries}</div>
+          <div class="stat-label">Total de Consultas</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">${s.today_queries} hoje</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="background:linear-gradient(90deg,var(--purple),#fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${s.total_saved}</div>
+          <div class="stat-label">Empresas Salvas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="background:linear-gradient(90deg,var(--orange),#fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${s.total_investigations}</div>
+          <div class="stat-label">Investigações</div>
+        </div>
+      `;
+    }
+  } catch(e){ toast('Erro ao carregar stats','error'); }
+}
+
+/* ── USERS ── */
+async function loadUsers(){
+  const container = document.getElementById('users-list');
+  container.innerHTML='<div class="spinner"></div>';
+  try{
+    const r = await fetch('/api/admin/users');
+    const d = await r.json();
+    if(r.ok && d.status==='ok') renderUsers(container, d.data);
+    else container.innerHTML='<p style="color:var(--red)">Erro ao carregar</p>';
+  } catch(e){ container.innerHTML='<p style="color:var(--red)">Erro de conexão</p>'; }
+}
+
+function roleBadge(role){
+  if(role==='admin') return `<span class="badge badge-red">ADMIN</span>`;
+  if(role==='operator') return `<span class="badge badge-orange">OPERATOR</span>`;
+  return `<span class="badge badge-blue">USER</span>`;
+}
+
+function renderUsers(container, data){
+  container.innerHTML=`<div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Usuário</th><th>E-mail</th><th>Papel</th><th>Status</th><th>Último Login</th><th>Tentativas</th><th>Ações</th></tr></thead>
+      <tbody>
+        ${data.map(u=>`<tr>
+          <td style="font-family:var(--mono)">${u.id}</td>
+          <td style="font-weight:700">${u.username}</td>
+          <td style="font-size:11px">${u.email}</td>
+          <td>${roleBadge(u.role)}</td>
+          <td>${u.is_active
+              ? '<span class="badge badge-green">ATIVO</span>'
+              : '<span class="badge badge-red">INATIVO</span>'}
+              ${u.locked_until ? '<span class="badge badge-orange" style="margin-left:4px">BLOQ</span>' : ''}
+          </td>
+          <td style="font-family:var(--mono);font-size:10px">${u.last_login?new Date(u.last_login).toLocaleString('pt-BR'):'—'}</td>
+          <td style="font-family:var(--mono)">${u.failed_attempts}</td>
+          <td>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost btn-xs" onclick="openEditModal(${JSON.stringify(u).replace(/"/g,'&quot;')})">Editar</button>
+              ${u.is_active
+                ?`<button class="btn btn-danger btn-xs" onclick="deactivateUser(${u.id},'${u.username}')">Desativar</button>`
+                :`<button class="btn btn-ghost btn-xs" onclick="activateUser(${u.id})">Ativar</button>`}
+              ${u.locked_until?`<button class="btn btn-ghost btn-xs" onclick="unlockUser(${u.id})">Desbloquear</button>`:''}
+            </div>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function openNewUserModal(){
+  document.getElementById('modal-title').textContent='Novo Usuário';
+  document.getElementById('edit-uid').value='';
+  document.getElementById('u-username').value='';
+  document.getElementById('u-email').value='';
+  document.getElementById('u-password').value='';
+  document.getElementById('u-role').value='user';
+  document.getElementById('pw-hint').style.display='none';
+  document.getElementById('u-username').disabled=false;
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function openEditModal(u){
+  document.getElementById('modal-title').textContent='Editar Usuário';
+  document.getElementById('edit-uid').value=u.id;
+  document.getElementById('u-username').value=u.username;
+  document.getElementById('u-username').disabled=true;
+  document.getElementById('u-email').value=u.email;
+  document.getElementById('u-password').value='';
+  document.getElementById('u-role').value=u.role;
+  document.getElementById('pw-hint').style.display='inline';
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function closeUserModal(){ document.getElementById('user-modal').classList.remove('open'); }
+
+async function saveUser(){
+  const uid  = document.getElementById('edit-uid').value;
+  const body = {
+    email:    document.getElementById('u-email').value,
+    role:     document.getElementById('u-role').value,
+  };
+  if(!uid){ body.username = document.getElementById('u-username').value; }
+  const pw = document.getElementById('u-password').value;
+  if(pw) body.password = pw;
+
+  let url, method;
+  if(uid){ url=`/api/admin/users/${uid}`; method='PUT'; }
+  else { url='/api/auth/register'; method='POST'; body.username=document.getElementById('u-username').value; }
+
+  const r = await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d = await r.json();
+  if(r.ok){ toast(d.message||'Salvo!','success'); closeUserModal(); loadUsers(); }
+  else toast(d.message||'Erro','error');
+}
+
+async function deactivateUser(id, name){
+  if(!confirm(`Desativar ${name}?`)) return;
+  const r = await fetch(`/api/admin/users/${id}/deactivate`,{method:'POST'});
+  if(r.ok){ toast('Usuário desativado','info'); loadUsers(); }
+  else toast('Erro','error');
+}
+
+async function activateUser(id){
+  const r = await fetch(`/api/admin/users/${id}/activate`,{method:'POST'});
+  if(r.ok){ toast('Usuário ativado','success'); loadUsers(); }
+  else toast('Erro','error');
+}
+
+async function unlockUser(id){
+  const r = await fetch(`/api/admin/users/${id}/unlock`,{method:'POST'});
+  if(r.ok){ toast('Conta desbloqueada','success'); loadUsers(); }
+  else toast('Erro','error');
+}
+
+/* ── AUDIT ── */
+async function loadAudit(){
+  const container = document.getElementById('audit-list');
+  container.innerHTML='<div class="spinner"></div>';
+  try{
+    const r = await fetch(`/api/admin/audit-log?page=${auditPage}&per=50`);
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      allAuditData = d.data;
+      document.getElementById('audit-count').textContent=`${d.total} registros · Página ${auditPage}`;
+      renderAudit(container, d.data);
+      document.getElementById('audit-prev').disabled = auditPage<=1;
+      document.getElementById('audit-next').disabled = d.data.length<50;
+    }
+  } catch(e){ container.innerHTML='<p style="color:var(--red)">Erro</p>'; }
+}
+
+function filterAudit(){
+  const q = document.getElementById('audit-filter').value.toLowerCase();
+  const filtered = allAuditData.filter(l=>!q||l.action.toLowerCase().includes(q));
+  renderAudit(document.getElementById('audit-list'), filtered);
+}
+
+function actionBadge(action){
+  if(action.includes('login_fail')||action.includes('fail')||action.includes('block')) return `<span class="badge badge-red">${action}</span>`;
+  if(action.includes('login_success')) return `<span class="badge badge-green">${action}</span>`;
+  if(action.includes('admin')) return `<span class="badge badge-orange">${action}</span>`;
+  return `<span class="badge badge-blue">${action}</span>`;
+}
+
+function renderAudit(container, data){
+  if(!data.length){ container.innerHTML='<p class="text-muted" style="padding:20px">Nenhum registro</p>'; return; }
+  container.innerHTML=`<div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Ação</th><th>Usuário</th><th>Recurso</th><th>IP</th><th>Status</th><th>Data</th></tr></thead>
+      <tbody>
+        ${data.map(l=>`<tr>
+          <td style="font-family:var(--mono)">${l.id}</td>
+          <td>${actionBadge(l.action)}</td>
+          <td style="font-family:var(--mono)">${l.user_id||'—'}</td>
+          <td style="font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.resource||l.details||'—'}</td>
+          <td style="font-family:var(--mono);font-size:10px">${l.ip_address||'—'}</td>
+          <td>${l.status==='success'?'<span class="badge badge-green">OK</span>':'<span class="badge badge-red">FAIL</span>'}</td>
+          <td style="font-family:var(--mono);font-size:10px;white-space:nowrap">${new Date(l.created_at).toLocaleString('pt-BR')}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/* ── CACHE ── */
+async function clearCache(){
+  if(!confirm('Limpar o cache de consultas CNPJ?')) return;
+  const r = await fetch('/api/admin/cache/clear',{method:'POST'});
+  const d = await r.json();
+  toast(d.message||'Cache limpo','success');
+}
+
+/* ── TOAST ── */
+function toast(msg, type='info'){
+  const el = document.getElementById('toast');
+  el.textContent=msg; el.className=type; el.style.display='block';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.style.display='none',4000);
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeUserModal(); });
+</script>
+</body>
+</html>

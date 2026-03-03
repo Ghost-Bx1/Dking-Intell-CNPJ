@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DKing Intel · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#05080f;
+  --surface:#080c15;
+  --card:#0c1220;
+  --card2:#101828;
+  --border:#1a2540;
+  --border2:#243354;
+  --blue:#1a6fff;
+  --blue-d:#0f4fcf;
+  --cyan:#00b4d8;
+  --teal:#00c9a7;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --purple:#8b5cf6;
+  --text:#dde6f5;
+  --text2:#7b93bb;
+  --muted:#334466;
+  --font:'IBM Plex Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --nav:230px;
+  --top:52px;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow:hidden}
+a{color:inherit;text-decoration:none}
+*::-webkit-scrollbar{width:4px;height:4px}
+*::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+*::-webkit-scrollbar-track{background:transparent}
+
+#app{display:flex;height:100vh}
+
+/* ── Sidebar ── */
+.nav{
+  width:var(--nav);min-width:var(--nav);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:50;
+}
+.nav-header{padding:16px;border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-icon{
+  width:34px;height:34px;border-radius:7px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(26,111,255,.35);
+}
+.nav-icon svg{width:18px;height:18px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nav-brand{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.nav-ver{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.5px}
+
+.nav-body{flex:1;overflow-y:auto;padding:10px 8px}
+.nav-section{margin-bottom:22px}
+.nav-label{
+  font-family:var(--mono);font-size:9px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.8px;
+  padding:0 8px;margin-bottom:5px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:6px;
+  font-size:13px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:.15s;margin-bottom:1px;
+  user-select:none;
+}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+.nav-item:hover{background:rgba(26,111,255,.07);color:var(--text)}
+.nav-item.active{background:rgba(26,111,255,.13);color:var(--blue);font-weight:600}
+.nav-item.active svg{stroke:var(--blue)}
+.nav-item .n-badge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  background:var(--blue);color:#fff;padding:1px 5px;border-radius:3px;
+}
+
+.nav-footer{padding:12px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px}
+.user-av{
+  width:30px;height:30px;border-radius:6px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;
+}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.btn-exit{
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  padding:4px;border-radius:4px;transition:.15s;
+}
+.btn-exit:hover{color:var(--red);background:rgba(239,68,68,.1)}
+.btn-exit svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.topbar{
+  height:var(--top);min-height:var(--top);
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+}
+.topbar-title{font-size:14px;font-weight:600;flex:1;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-time{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.topbar-env{
+  font-family:var(--mono);font-size:9px;padding:3px 7px;border-radius:4px;
+  background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);
+  color:var(--teal);letter-spacing:.5px;
+}
+
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* ── Panels ── */
+.panel{display:none}.panel.active{display:block}
+
+/* ── Search bar ── */
+.query-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:18px 20px;margin-bottom:18px;
+}
+.query-modes{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.qm{
+  padding:5px 13px;border-radius:4px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  color:var(--text2);border:1px solid var(--border);
+  transition:.12s;background:none;
+}
+.qm:hover{color:var(--text);border-color:var(--border2)}
+.qm.active{color:var(--blue);background:rgba(26,111,255,.1);border-color:rgba(26,111,255,.3)}
+
+.query-row{display:flex;gap:10px}
+.q-input{
+  flex:1;padding:10px 14px;
+  background:var(--card2);
+  border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:var(--mono);font-size:13px;
+  outline:none;transition:.15s;
+}
+.q-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,111,255,.1)}
+.q-input::placeholder{color:var(--muted)}
+
+/* ── Buttons ── */
+.btn{
+  padding:9px 16px;border-radius:6px;border:none;
+  cursor:pointer;font-family:var(--font);font-size:12px;
+  font-weight:600;transition:.15s;white-space:nowrap;
+}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);box-shadow:0 3px 14px rgba(26,111,255,.35)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.15)}
+.btn-teal{background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
+.btn-teal:hover{background:rgba(0,201,167,.18)}
+.btn-sm{padding:6px 11px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+.card-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px;margin-top:-8px}
+
+/* ── Grid ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:960px){.grid2{grid-template-columns:1fr}}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.grid4{grid-template-columns:1fr}}
+.auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+
+/* ── Badges ── */
+.badge{
+  display:inline-flex;align-items:center;padding:2px 7px;
+  border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:500;
+}
+.badge-teal{background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.2)}
+.badge-red{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.badge-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.badge-blue{background:rgba(26,111,255,.1);color:var(--blue);border:1px solid rgba(26,111,255,.2)}
+.badge-purple{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+.badge-muted{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border)}
+
+/* ── Data rows ── */
+.data-grid{display:flex;flex-direction:column;gap:7px}
+.data-row{display:flex;align-items:flex-start;gap:8px;font-size:12px}
+.data-key{font-family:var(--mono);font-size:10px;color:var(--muted);min-width:130px;flex-shrink:0;padding-top:1px;letter-spacing:.3px}
+.data-val{color:var(--text2);word-break:break-word;line-height:1.5}
+.data-val.hl{color:var(--blue);font-weight:600;font-family:var(--mono);letter-spacing:.5px}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--card2)}
+th{padding:9px 12px;font-family:var(--mono);font-size:9px;color:var(--muted);
+   text-transform:uppercase;letter-spacing:1.2px;text-align:left;
+   border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 12px;color:var(--text2);border-bottom:1px solid rgba(26,37,64,.6);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(26,111,255,.03)}
+td.mono{font-family:var(--mono);font-size:11px}
+td.link{color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:11px}
+td.link:hover{text-decoration:underline}
+
+/* ── Socio card ── */
+.socio-list{display:flex;flex-direction:column;gap:7px}
+.socio-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:var(--card2);border:1px solid var(--border);border-radius:7px;
+  transition:.15s;
+}
+.socio-item:hover{border-color:var(--border2)}
+.socio-av{
+  width:34px;height:34px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;
+  background:linear-gradient(135deg,var(--blue-d),var(--purple));
+}
+.socio-info{flex:1;min-width:0}
+.socio-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.socio-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.socio-cpf{font-family:var(--mono);font-size:10px;color:var(--cyan);margin-top:1px}
+
+/* ── Sources pill ── */
+.sources{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.src-pill{
+  font-family:var(--mono);font-size:9px;padding:2px 7px;
+  border-radius:3px;background:rgba(0,180,216,.08);
+  border:1px solid rgba(0,180,216,.2);color:var(--cyan);letter-spacing:.5px;
+}
+
+/* ── Section header ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:14px;font-weight:600}
+.sec-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ── Chips (cross ref) ── */
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;background:var(--card2);
+  border:1px solid var(--border);border-radius:4px;
+  font-family:var(--mono);font-size:11px;color:var(--text2);
+}
+.chip-rm{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;transition:.12s;padding:0}
+.chip-rm:hover{color:var(--red)}
+
+/* ── Social links ── */
+.social-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:7px}
+.social-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:6px;
+  background:var(--card2);border:1px solid var(--border);
+  font-size:11px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:.12s;
+}
+.social-item:hover{border-color:var(--border2);color:var(--text);background:rgba(26,111,255,.05)}
+.social-item svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+
+/* ── Saved ── */
+.saved-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:14px;transition:.15s;
+}
+.saved-card:hover{border-color:var(--border2)}
+.tag{
+  display:inline-flex;padding:1px 6px;border-radius:3px;
+  font-family:var(--mono);font-size:9px;
+  background:rgba(139,92,246,.1);color:var(--purple);
+  border:1px solid rgba(139,92,246,.2);margin:1px;
+}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  padding:10px 16px;border-radius:6px;
+  font-family:var(--mono);font-size:11px;display:none;
+  animation:toast-in .18s ease;
+}
+@keyframes toast-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+#toast.success{background:#06140f;border:1px solid rgba(0,201,167,.3);color:var(--teal)}
+#toast.error{background:#140809;border:1px solid rgba(239,68,68,.3);color:#f87171}
+#toast.info{background:#070e1e;border:1px solid rgba(26,111,255,.3);color:var(--blue)}
+
+/* ── Misc ── */
+.spinner{width:26px;height:26px;border:2px solid rgba(26,111,255,.15);border-top-color:var(--blue);border-radius:50%;animation:spin .5s linear infinite;margin:24px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty svg{width:40px;height:40px;stroke:var(--muted);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px;opacity:.4}
+.empty p{font-size:12px}
+.flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}
+.justify-between{justify-content:space-between}.flex-1{flex:1}.flex-wrap{flex-wrap:wrap}
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}
+.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}
+.text-xs{font-family:var(--mono);font-size:10px}.text-muted{color:var(--muted)}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-full{width:100%}.font-bold{font-weight:700}
+
+/* stat card */
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.stat-card.teal::before{background:linear-gradient(90deg,var(--teal),var(--cyan))}
+.stat-card.purple::before{background:linear-gradient(90deg,var(--purple),var(--blue))}
+.stat-card.amber::before{background:linear-gradient(90deg,var(--amber),var(--red))}
+.stat-num{font-size:30px;font-weight:700;margin-bottom:4px;color:#fff}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:6px}
+
+/* alert highlight box */
+.alert-box{
+  padding:12px 14px;border-radius:6px;margin-bottom:14px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.alert-box.warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)}
+.alert-box svg{width:16px;height:16px;flex-shrink:0;stroke:var(--amber);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.alert-box p{font-size:12px;color:var(--text2)}
+.alert-box strong{color:var(--amber)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav class="nav">
+  <div class="nav-header">
+    <div class="nav-logo">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="8.5" x2="22" y2="8.5"/></svg>
+      </div>
+      <div>
+        <div class="nav-brand">DKing Intel</div>
+        <div class="nav-ver">CORPORATE INTELLIGENCE</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-body">
+    <div class="nav-section">
+      <div class="nav-label">Consultas</div>
+      <div class="nav-item active" data-panel="search" onclick="showPanel('search')">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Busca de Empresas
+      </div>
+      <div class="nav-item" data-panel="cross" onclick="showPanel('cross')">
+        <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Cruzamento de Dados
+      </div>
+      <div class="nav-item" data-panel="socio" onclick="showPanel('socio')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Busca por Sócio
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Gestão</div>
+      <div class="nav-item" data-panel="saved" onclick="showPanel('saved')">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Empresas Salvas
+      </div>
+      <div class="nav-item" data-panel="investigations" onclick="showPanel('investigations')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Investigações
+      </div>
+      <div class="nav-item" data-panel="history" onclick="showPanel('history')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Histórico
+      </div>
+    </div>
+
+    <div class="nav-section" id="admin-section" style="display:none">
+      <div class="nav-label">Administração</div>
+      <div class="nav-item" onclick="location.href='/admin'">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Painel Admin
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <div class="user-row">
+      <div class="user-av" id="user-av">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name">Carregando…</div>
+        <div class="user-role" id="user-role">—</div>
+      </div>
+      <button class="btn-exit" onclick="doLogout()" title="Sair">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Busca de Empresas</span>
+    <div class="topbar-right">
+      <span class="topbar-env">LIVE</span>
+      <span class="topbar-time" id="topbar-time"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ════ SEARCH PANEL ════ -->
+    <div class="panel active" id="panel-search">
+      <div class="query-box">
+        <div class="query-modes">
+          <button class="qm active" onclick="setMode('cnpj',this)">CNPJ</button>
+          <button class="qm" onclick="setMode('name',this)">Nome da Empresa</button>
+        </div>
+        <div class="query-row">
+          <input class="q-input" id="q-input" placeholder="00.000.000/0000-00" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="btn btn-primary" id="btn-search" onclick="doSearch()">Consultar</button>
+        </div>
+      </div>
+      <div id="search-result"></div>
+    </div>
+
+    <!-- ════ CROSS PANEL ════ -->
+    <div class="panel" id="panel-cross">
+      <div class="query-box">
+        <div class="sec-head" style="margin-bottom:10px">
+          <div>
+            <div class="sec-title">Cruzamento de Dados</div>
+            <div class="sec-sub">Adicione até 10 CNPJs para identificar sócios em comum e ramificações</div>
+          </div>
+        </div>
+        <div class="query-row" style="margin-bottom:10px">
+          <input class="q-input" id="cross-input" placeholder="Insira um CNPJ e clique em Adicionar" onkeydown="if(event.key==='Enter')addChip()">
+          <button class="btn btn-ghost" onclick="addChip()">+ Adicionar</button>
+        </div>
+        <div class="chip-list" id="chips"></div>
+        <button class="btn btn-primary" id="btn-cross" onclick="doCross()">Executar Cruzamento</button>
+      </div>
+      <div id="cross-result"></div>
+    </div>
+
+    <!-- ════ SOCIO PANEL ════ -->
+    <div class="panel" id="panel-socio">
+      <div class="query-box">
+        <div class="sec-head" style="margin-bottom:10px">
+          <div>
+            <div class="sec-title">Busca por Sócio</div>
+            <div class="sec-sub">Encontre todas as empresas vinculadas a um nome</div>
+          </div>
+        </div>
+        <div class="query-row">
+          <input class="q-input" id="socio-input" placeholder="Nome do sócio ou representante legal…" onkeydown="if(event.key==='Enter')doSocio()">
+          <button class="btn btn-primary" onclick="doSocio()">Buscar</button>
+        </div>
+      </div>
+      <div id="socio-result"></div>
+    </div>
+
+    <!-- ════ SAVED PANEL ════ -->
+    <div class="panel" id="panel-saved">
+      <div class="sec-head">
+        <div class="sec-title">Empresas Salvas</div>
+        <button class="btn btn-ghost btn-sm" onclick="loadSaved()">↻ Atualizar</button>
+      </div>
+      <div id="saved-list"></div>
+    </div>
+
+    <!-- ════ INVESTIGATIONS PANEL ════ -->
+    <div class="panel" id="panel-investigations">
+      <div class="sec-head">
+        <div class="sec-title">Investigações</div>
+        <button class="btn btn-primary btn-sm" onclick="openInvModal()">+ Nova Investigação</button>
+      </div>
+      <div id="inv-list"></div>
+    </div>
+
+    <!-- ════ HISTORY PANEL ════ -->
+    <div class="panel" id="panel-history">
+      <div class="sec-head">
+        <div class="sec-title">Histórico de Buscas</div>
+        <button class="btn btn-danger btn-sm" onclick="clearHistory()">Limpar histórico</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- Modal: Nova Investigação -->
+<div id="modal-inv" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(5,8,15,.85);align-items:center;justify-content:center" onclick="if(event.target===this)closeModal('modal-inv')">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;width:400px;max-width:95vw">
+    <div style="font-size:14px;font-weight:600;margin-bottom:18px">Nova Investigação</div>
+    <div style="margin-bottom:13px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Nome</label>
+      <input class="q-input w-full" id="inv-name" placeholder="Ex: Grupo Empresarial ABC">
+    </div>
+    <div style="margin-bottom:18px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Descrição</label>
+      <input class="q-input w-full" id="inv-desc" placeholder="Contexto da investigação…">
+    </div>
+    <div class="flex gap-2 justify-between">
+      <button class="btn btn-ghost" onclick="closeModal('modal-inv')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createInv()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══ STATE ════════════════════════════════════════════════════════════ */
+let searchMode = 'cnpj';
+let crossList  = [];
+let toastTimer = null;
+
+/* ═══ INIT ════════════════════════════════════════════════════════════ */
+(async ()=>{
+  await loadUser();
+  setInterval(updateTime,1000);
+  updateTime();
+})();
+
+async function loadUser(){
+  try{
+    const r = await fetch('/api/auth/me');
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      const u = d.user;
+      document.getElementById('user-name').textContent = u.username;
+      document.getElementById('user-role').textContent = u.role.toUpperCase();
+      document.getElementById('user-av').textContent   = u.username[0].toUpperCase();
+      if(u.role==='admin') document.getElementById('admin-section').style.display='block';
+    } else location.href='/login';
+  } catch(e){ location.href='/login'; }
+}
+
+function updateTime(){
+  document.getElementById('topbar-time').textContent =
+    new Date().toLocaleTimeString('pt-BR');
+}
+
+/* ═══ NAVIGATION ═══════════════════════════════════════════════════════ */
+const TITLES = {
+  search:'Busca de Empresas', cross:'Cruzamento de Dados',
+  socio:'Busca por Sócio', saved:'Empresas Salvas',
+  investigations:'Investigações', history:'Histórico de Buscas',
+};
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('topbar-title').textContent = TITLES[id]||id;
+  document.querySelector(`.nav-item[data-panel="${id}"]`)?.classList.add('active');
+  if(id==='saved')         loadSaved();
+  if(id==='investigations') loadInvestigations();
+  if(id==='history')       loadHistory();
+}
+
+/* ═══ SEARCH ═══════════════════════════════════════════════════════════ */
+function setMode(mode, el){
+  searchMode = mode;
+  document.querySelectorAll('.qm').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const inp = document.getElementById('q-input');
+  inp.placeholder = mode==='cnpj' ? '00.000.000/0000-00' : 'Nome da empresa…';
+  document.getElementById('search-result').innerHTML = '';
+  inp.value = '';
+}
+
+function maskCnpj(v){
+  v = v.replace(/\D/g,'').slice(0,14);
+  if(v.length<=2) return v;
+  if(v.length<=5) return v.slice(0,2)+'.'+v.slice(2);
+  if(v.length<=8) return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5);
+  if(v.length<=12) return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8);
+  return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8,12)+'-'+v.slice(12);
+}
+document.getElementById('q-input').addEventListener('input', function(){
+  if(searchMode==='cnpj') this.value = maskCnpj(this.value);
+});
+
+async function doSearch(){
+  const val = document.getElementById('q-input').value.trim();
+  const btn = document.getElementById('btn-search');
+  const res = document.getElementById('search-result');
+  if(!val){ toast('Digite um valor','error'); return; }
+  btn.disabled=true; btn.textContent='Buscando…';
+  res.innerHTML='<div class="spinner"></div>';
+  try{
+    if(searchMode==='cnpj'){
+      const c = val.replace(/\D/g,'');
+      if(c.length!==14){ toast('CNPJ inválido','error'); res.innerHTML=''; return; }
+      const r = await fetch(`/api/cnpj/${c}`);
+      const d = await r.json();
+      if(r.ok && d.status==='ok') renderCompany(res, d.data);
+      else { toast(d.message||'Erro ao consultar','error'); res.innerHTML=''; }
+    } else {
+      if(val.length<2){ toast('Mínimo 2 caracteres','error'); res.innerHTML=''; return; }
+      const r = await fetch(`/api/search/name?q=${encodeURIComponent(val)}`);
+      const d = await r.json();
+      if(r.ok && d.status==='ok') renderNameList(res, d.data);
+      else { toast(d.message||'Erro','error'); res.innerHTML=''; }
+    }
+  } finally{ btn.disabled=false; btn.textContent='Consultar'; }
+}
+
+/* ── Formatters ── */
+function fCnpj(c){
+  c=(c||'').replace(/\D/g,'');
+  return c.length===14 ? `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5,8)}/${c.slice(8,12)}-${c.slice(12)}` : c;
+}
+function fCapital(v){
+  if(!v||v==='None'||v==='0'||v==='') return '—';
+  const n=parseFloat(v.toString().replace(/[^\d.]/g,''));
+  if(isNaN(n)) return v;
+  return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
+}
+function situBadge(s){
+  s=(s||'').toUpperCase();
+  if(s.includes('ATIVA'))   return `<span class="badge badge-teal">● ATIVA</span>`;
+  if(s.includes('BAIXADA')) return `<span class="badge badge-red">● BAIXADA</span>`;
+  if(s.includes('INAPT'))   return `<span class="badge badge-amber">● INAPTA</span>`;
+  if(s.includes('SUSPENS')) return `<span class="badge badge-amber">● SUSPENSA</span>`;
+  return s ? `<span class="badge badge-muted">${s}</span>` : '';
+}
+
+/* ── Full company render ── */
+function renderCompany(container, d){
+  const socios  = d.qsa || [];
+  const ativS   = d.atividades_secundarias || [];
+  const filiais = d.filiais || [];
+  const ativP   = (d.atividade_principal||[{}])[0]||{};
+  const sources = d._sources || [d._source||'?'];
+
+  container.innerHTML = `
+  <!-- Sources -->
+  <div class="sources mb-3">${sources.map(s=>`<span class="src-pill">✓ ${s}</span>`).join('')}
+    <span class="src-pill" style="color:var(--muted);border-color:var(--border)">${sources.length} fonte(s) consultada(s)</span>
+  </div>
+
+  <div class="grid2">
+    <!-- Dados Gerais -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#fff">${d.nome||'—'}</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">${d.fantasia ? d.fantasia+' · ' : ''}${fCnpj(d.cnpj)}</div>
+        </div>
+        <div class="flex gap-2 flex-wrap" style="justify-content:flex-end">
+          ${situBadge(d.situacao)}
+          <button class="btn btn-ghost btn-xs" onclick="saveCompany('${d.cnpj}','${(d.nome||'').replace(/'/g,"\\'")}')">♡ Salvar</button>
+        </div>
+      </div>
+      <div class="data-grid">
+        <div class="data-row"><span class="data-key">CNPJ</span><span class="data-val hl">${fCnpj(d.cnpj)}</span></div>
+        <div class="data-row"><span class="data-key">Razão Social</span><span class="data-val">${d.nome||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Nome Fantasia</span><span class="data-val">${d.fantasia||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Nat. Jurídica</span><span class="data-val">${d.natureza_juridica||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Porte</span><span class="data-val">${d.porte||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Capital Social</span><span class="data-val">${fCapital(d.capital_social)}</span></div>
+        <div class="data-row"><span class="data-key">Fundação</span><span class="data-val">${d.abertura||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Situação</span><span class="data-val">${d.situacao||'—'}</span></div>
+        ${d.simples_optante ? `<div class="data-row"><span class="data-key">Simples</span><span class="data-val">${d.simples_optante==='Sim'?'<span class="badge badge-teal">SIM</span>':'<span class="badge badge-muted">NÃO</span>'}</span></div>` : ''}
+        ${d.mei ? `<div class="data-row"><span class="data-key">MEI</span><span class="data-val">${d.mei==='Sim'?'<span class="badge badge-teal">SIM</span>':'<span class="badge badge-muted">NÃO</span>'}</span></div>` : ''}
+      </div>
+    </div>
+
+    <!-- Endereço & Contato -->
+    <div class="card">
+      <div class="card-title">Localização & Contato</div>
+      <div class="data-grid">
+        <div class="data-row"><span class="data-key">Endereço</span><span class="data-val">${[d.logradouro,d.numero,d.complemento].filter(Boolean).join(', ')||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Bairro</span><span class="data-val">${d.bairro||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Município</span><span class="data-val">${[d.municipio,d.uf].filter(Boolean).join(' / ')||'—'}</span></div>
+        <div class="data-row"><span class="data-key">CEP</span><span class="data-val">${d.cep||'—'}</span></div>
+        <div class="data-row"><span class="data-key">E-mail</span><span class="data-val">${d.email||'—'}</span></div>
+        <div class="data-row"><span class="data-key">Telefone</span><span class="data-val">${d.telefone||'—'}</span></div>
+        ${d.telefone2 ? `<div class="data-row"><span class="data-key">Telefone 2</span><span class="data-val">${d.telefone2}</span></div>` : ''}
+      </div>
+      <div class="divider"></div>
+      <div class="card-title">Atividades</div>
+      <div class="data-grid">
+        <div class="data-row"><span class="data-key">CNAE Principal</span><span class="data-val">${ativP.code ? `<span class="badge badge-blue" style="margin-right:4px">${ativP.code}</span>${ativP.text}` : '—'}</span></div>
+        ${ativS.length ? `<div class="data-row"><span class="data-key">CNAEs Sec.</span><span class="data-val">${ativS.slice(0,5).map(a=>`<div style="margin-bottom:4px"><span class="badge badge-muted" style="margin-right:4px">${a.code}</span>${a.text}</div>`).join('')}${ativS.length>5?`<div class="text-muted text-xs">+${ativS.length-5} mais…</div>`:''}</span></div>` : ''}
+      </div>
+    </div>
+
+    <!-- QSA -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="card-title" style="margin-bottom:0">Quadro Societário (QSA)</div>
+          <div class="text-xs text-muted mt-2">${socios.length} sócio(s) identificado(s)</div>
+        </div>
+        ${socios.length ? `<button class="btn btn-ghost btn-xs" onclick="showPanel('socio');document.getElementById('socio-input').value='${(socios[0]?.nome||'').replace(/'/g,"\\'")}';doSocio()">Investigar sócios</button>` : ''}
+      </div>
+      ${socios.length ? `
+        <div class="socio-list">
+          ${socios.map((s,i)=>`
+            <div class="socio-item">
+              <div class="socio-av">${(s.nome||'?')[0].toUpperCase()}</div>
+              <div class="socio-info">
+                <div class="socio-name">${s.nome||'—'}</div>
+                <div class="socio-meta">${s.qual||'—'}${s.data_entrada?' · desde '+s.data_entrada:''}</div>
+                ${s.cpf_cnpj ? `<div class="socio-cpf">CPF/CNPJ: ${s.cpf_cnpj}</div>` : ''}
+                ${s.representante ? `<div class="socio-meta">Rep: ${s.representante}</div>` : ''}
+              </div>
+              <button class="btn btn-ghost btn-xs" onclick="searchSocio('${(s.nome||'').replace(/'/g,"\\'")}')">🔍</button>
+            </div>`).join('')}
+        </div>` : '<div class="empty"><p>Nenhum sócio registrado</p></div>'}
+    </div>
+
+    <!-- Filiais -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="card-title" style="margin-bottom:0">Filiais</div>
+          <div class="text-xs text-muted mt-2">${filiais.length ? filiais.length+' filial(is) na consulta' : 'Carregue para ver filiais'}</div>
+        </div>
+        <button class="btn btn-ghost btn-xs" id="btn-filiais-${d.cnpj}" onclick="loadFiliais('${d.cnpj}',this)">Carregar filiais</button>
+      </div>
+      <div id="filiais-${d.cnpj}">
+        ${filiais.length ? renderFiliaisTable(filiais) : '<div class="empty"><p>Clique em "Carregar filiais"</p></div>'}
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Intelligence -->
+  <div class="card mt-4">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <div class="card-title" style="margin-bottom:0">Inteligência Digital & Presença Online</div>
+        <div class="text-xs text-muted mt-2">Links de pesquisa para <strong>${d.nome}</strong></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btn-social-${d.cnpj}" onclick="loadSocial('${d.cnpj}','${(d.nome||'').replace(/'/g,"\\'")}',this)">Gerar links</button>
+    </div>
+    <div id="social-${d.cnpj}"></div>
+  </div>
+
+  <!-- Actions bar -->
+  <div class="flex gap-2 mt-3 flex-wrap">
+    <button class="btn btn-ghost btn-sm" onclick="addToCross('${d.cnpj}')">➕ Adicionar ao Cruzamento</button>
+    <button class="btn btn-ghost btn-sm" onclick="saveCompany('${d.cnpj}','${(d.nome||'').replace(/'/g,"\\'")}')">♡ Salvar empresa</button>
+  </div>
+  `;
+}
+
+function renderFiliaisTable(filiais){
+  if(!filiais.length) return '<div class="empty"><p>Nenhuma filial encontrada</p></div>';
+  return `<div class="tbl-wrap"><table>
+    <thead><tr><th>CNPJ</th><th>Fantasia</th><th>Município</th><th>UF</th><th>Situação</th></tr></thead>
+    <tbody>${filiais.map(f=>`<tr>
+      <td class="link" onclick="searchCnpj('${f.cnpj}')">${fCnpj(f.cnpj)}</td>
+      <td>${f.fantasia||'—'}</td>
+      <td>${f.municipio||'—'}</td>
+      <td>${f.uf||'—'}</td>
+      <td>${situBadge(f.situacao)}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function renderNameList(container, data){
+  if(!data||!data.length){
+    container.innerHTML='<div class="empty"><p>Nenhuma empresa encontrada</p></div>';
+    return;
+  }
+  container.innerHTML=`<div class="card">
+    <div class="card-title">Resultados (${data.length})</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>CNPJ</th><th>Razão Social</th><th>Município</th><th>UF</th><th>Situação</th><th></th></tr></thead>
+      <tbody>${data.map(c=>`<tr>
+        <td class="link" onclick="searchCnpj('${c.cnpj}')">${fCnpj(c.cnpj)}</td>
+        <td style="max-width:200px" class="truncate">${c.nome||'—'}</td>
+        <td>${c.municipio||'—'}</td>
+        <td>${c.uf||'—'}</td>
+        <td>${situBadge(c.situacao)}</td>
+        <td><button class="btn btn-ghost btn-xs" onclick="searchCnpj('${c.cnpj}')">Ver</button></td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+async function loadFiliais(cnpj, btn){
+  btn.disabled=true; btn.textContent='Carregando…';
+  const c = document.getElementById('filiais-'+cnpj);
+  try{
+    const r = await fetch(`/api/cnpj/${cnpj}/filiais`);
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      c.innerHTML = renderFiliaisTable(d.data||[]);
+      toast(`${d.total} filial(is) carregada(s)`,'success');
+    } else toast(d.message||'Erro','error');
+  } finally{ btn.disabled=false; btn.textContent='Carregar filiais'; }
+}
+
+async function loadSocial(cnpj, nome, btn){
+  btn.disabled=true;
+  const c = document.getElementById('social-'+cnpj);
+  try{
+    const r = await fetch(`/api/cnpj/${cnpj}/social?nome=${encodeURIComponent(nome)}`);
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      c.innerHTML = `<div class="social-grid">
+        ${Object.entries(d.links).filter(([,v])=>v).map(([k,url])=>`
+          <a class="social-item" href="${url}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            ${k}
+          </a>`).join('')}
+      </div>`;
+    }
+  } finally{ if(btn) btn.disabled=false; }
+}
+
+function searchCnpj(cnpj){
+  showPanel('search');
+  setMode('cnpj', document.querySelectorAll('.qm')[0]);
+  document.getElementById('q-input').value = fCnpj(cnpj);
+  doSearch();
+}
+function searchSocio(nome){
+  showPanel('socio');
+  document.getElementById('socio-input').value = nome;
+  doSocio();
+}
+
+/* ═══ CROSS ════════════════════════════════════════════════════════════ */
+function addChip(){
+  const v = document.getElementById('cross-input').value.replace(/\D/g,'');
+  if(v.length!==14){ toast('CNPJ inválido','error'); return; }
+  if(crossList.includes(v)){ toast('Já adicionado','info'); return; }
+  if(crossList.length>=10){ toast('Máximo 10 CNPJs','error'); return; }
+  crossList.push(v);
+  document.getElementById('cross-input').value='';
+  renderChips();
+}
+function removeChip(c){ crossList=crossList.filter(x=>x!==c); renderChips(); }
+function renderChips(){
+  document.getElementById('chips').innerHTML = crossList.map(c=>`
+    <div class="chip">${fCnpj(c)}<button class="chip-rm" onclick="removeChip('${c}')">×</button></div>`).join('');
+}
+function addToCross(cnpj){
+  cnpj=cnpj.replace(/\D/g,'');
+  if(!crossList.includes(cnpj)){ crossList.push(cnpj); renderChips(); toast('Adicionado ao cruzamento','success'); }
+  showPanel('cross');
+}
+
+async function doCross(){
+  if(crossList.length<2){ toast('Adicione ao menos 2 CNPJs','error'); return; }
+  const btn=document.getElementById('btn-cross');
+  const res=document.getElementById('cross-result');
+  btn.disabled=true; btn.textContent='Cruzando…';
+  res.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await fetch('/api/cross-reference',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({cnpjs:crossList})
+    });
+    const d=await r.json();
+    if(r.ok && d.status==='ok') renderCross(res,d);
+    else { toast(d.message||'Erro','error'); res.innerHTML=''; }
+  } finally{ btn.disabled=false; btn.textContent='Executar Cruzamento'; }
+}
+
+function renderCross(container, d){
+  const comuns = d.socios_comuns||{};
+  let html = '';
+
+  if(Object.keys(comuns).length){
+    html += `<div class="alert-box warn mb-3">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p><strong>${Object.keys(comuns).length} sócio(s) em comum detectado(s)</strong> entre as empresas analisadas</p>
+    </div>
+
+    <div class="card mb-3" style="border-color:rgba(245,158,11,.25)">
+      <div class="card-title" style="color:var(--amber)">Sócios em Comum</div>
+      <div class="socio-list">
+        ${Object.entries(comuns).map(([nome,emps])=>`
+          <div class="socio-item" style="flex-direction:column;align-items:flex-start;gap:8px">
+            <div class="flex items-center gap-3 w-full">
+              <div class="socio-av">${nome[0]}</div>
+              <div class="socio-info">
+                <div class="socio-name">${nome}</div>
+                <div class="socio-meta">${emps.length} empresa(s) vinculadas</div>
+              </div>
+              <button class="btn btn-ghost btn-xs" onclick="searchSocio('${nome.replace(/'/g,"\\'")}')">Investigar</button>
+            </div>
+            <div style="padding-left:46px;display:flex;flex-wrap:wrap;gap:5px">
+              ${emps.map(e=>`<span class="tag">${e.empresa||e.cnpj} <span style="opacity:.5">${e.qualificacao}</span></span>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  html += `<div class="grid2">
+    ${d.results.map(r=>`
+      <div class="card">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div style="font-size:13px;font-weight:700">${r.data?.nome||fCnpj(r.cnpj)}</div>
+            <div class="text-xs text-muted mt-2">${fCnpj(r.cnpj)}</div>
+          </div>
+          ${r.data ? situBadge(r.data.situacao) : '<span class="badge badge-red">ERRO</span>'}
+        </div>
+        ${r.error ? `<div style="color:var(--red);font-size:12px">${r.error}</div>` : `
+          <div class="data-grid">
+            <div class="data-row"><span class="data-key">Porte</span><span class="data-val">${r.data.porte||'—'}</span></div>
+            <div class="data-row"><span class="data-key">Abertura</span><span class="data-val">${r.data.abertura||'—'}</span></div>
+            <div class="data-row"><span class="data-key">Município</span><span class="data-val">${[r.data.municipio,r.data.uf].filter(Boolean).join('/')||'—'}</span></div>
+            <div class="data-row"><span class="data-key">Sócios</span><span class="data-val">${(r.data.qsa||[]).length}</span></div>
+          </div>
+          <button class="btn btn-ghost btn-xs mt-3" onclick="searchCnpj('${r.cnpj}')">Ver detalhes</button>
+        `}
+      </div>`).join('')}
+  </div>`;
+  container.innerHTML = html;
+}
+
+/* ═══ SOCIO ════════════════════════════════════════════════════════════ */
+async function doSocio(){
+  const v = document.getElementById('socio-input').value.trim();
+  if(v.length<3){ toast('Mínimo 3 caracteres','error'); return; }
+  const res = document.getElementById('socio-result');
+  res.innerHTML='<div class="spinner"></div>';
+  try{
+    const r = await fetch(`/api/search/socio?nome=${encodeURIComponent(v)}`);
+    const d = await r.json();
+    if(r.ok && d.status==='ok'){
+      if(!d.data.length){
+        res.innerHTML='<div class="empty"><p>Nenhuma empresa encontrada para este nome</p></div>';
+        return;
+      }
+      res.innerHTML=`<div class="card">
+        <div class="card-title">Empresas vinculadas a "${v}" (${d.total})</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>CNPJ</th><th>Empresa</th><th>Qualificação</th><th></th></tr></thead>
+          <tbody>${d.data.map(c=>`<tr>
+            <td class="link" onclick="searchCnpj('${c.cnpj}')">${fCnpj(c.cnpj)}</td>
+            <td>${c.nome_empresa||'—'}</td>
+            <td>${c.qualificacao||'—'}</td>
+            <td class="flex gap-2">
+              <button class="btn btn-ghost btn-xs" onclick="searchCnpj('${c.cnpj}')">Ver</button>
+              <button class="btn btn-ghost btn-xs" onclick="addToCross('${c.cnpj}')">+</button>
+            </td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`;
+    } else { toast(d.message||'Erro','error'); res.innerHTML=''; }
+  } catch(e){ toast('Erro de conexão','error'); res.innerHTML=''; }
+}
+
+/* ═══ SAVED ════════════════════════════════════════════════════════════ */
+async function loadSaved(){
+  const c=document.getElementById('saved-list');
+  c.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await fetch('/api/saved');
+    const d=await r.json();
+    if(r.ok && d.status==='ok') renderSaved(c,d.data);
+    else c.innerHTML='<div class="empty"><p>Erro ao carregar</p></div>';
+  } catch(e){ c.innerHTML='<div class="empty"><p>Erro</p></div>'; }
+}
+function renderSaved(c,data){
+  if(!data.length){
+    c.innerHTML=`<div class="empty">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <p>Nenhuma empresa salva</p></div>`;
+    return;
+  }
+  c.innerHTML=`<div class="auto-grid">${data.map(i=>`
+    <div class="saved-card">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-muted">${fCnpj(i.cnpj)}</span>
+        <button class="btn btn-danger btn-xs" onclick="delSaved(${i.id})">✕</button>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)">${i.nome||'—'}</div>
+      ${i.notes?`<div style="font-size:11px;color:var(--text2);margin-bottom:7px">${i.notes}</div>`:''}
+      ${i.tags?`<div class="mb-2">${i.tags.split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('')}</div>`:''}
+      <div class="flex gap-2 mt-2">
+        <button class="btn btn-ghost btn-xs" onclick="searchCnpj('${i.cnpj}')">Ver empresa</button>
+        <button class="btn btn-ghost btn-xs" onclick="addToCross('${i.cnpj}')">Cruzar</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+async function saveCompany(cnpj,nome){
+  const r=await fetch('/api/saved',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cnpj,nome})});
+  const d=await r.json();
+  toast(d.message||(r.ok?'Salvo!':'Erro'),r.ok?'success':'error');
+}
+async function delSaved(id){
+  const r=await fetch(`/api/saved/${id}`,{method:'DELETE'});
+  if(r.ok){ toast('Removido','info'); loadSaved(); }
+  else toast('Erro','error');
+}
+
+/* ═══ INVESTIGATIONS ═══════════════════════════════════════════════════ */
+async function loadInvestigations(){
+  const c=document.getElementById('inv-list');
+  c.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await fetch('/api/investigations');
+    const d=await r.json();
+    if(r.ok&&d.status==='ok') renderInv(c,d.data);
+    else c.innerHTML='<div class="empty"><p>Erro</p></div>';
+  } catch(e){ c.innerHTML='<div class="empty"><p>Erro</p></div>'; }
+}
+function renderInv(c,data){
+  if(!data.length){
+    c.innerHTML=`<div class="empty">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p>Nenhuma investigação criada. Crie uma para agrupar CNPJs relacionados.</p></div>`;
+    return;
+  }
+  c.innerHTML=data.map(inv=>`
+    <div class="card mb-3">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div style="font-size:13px;font-weight:700">${inv.name}</div>
+          <div class="text-xs text-muted mt-2">${inv.description||'Sem descrição'} · ${inv.cnpjs.length} CNPJ(s)</div>
+        </div>
+        <div class="flex gap-2">
+          ${inv.cnpjs.length>=2?`<button class="btn btn-primary btn-xs" onclick="crossFromInv('${inv.cnpjs.join(',')}')">Cruzar</button>`:''}
+          <button class="btn btn-danger btn-xs" onclick="delInv(${inv.id})">✕</button>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${inv.cnpjs.map(c=>`<span class="tag" style="cursor:pointer;font-size:11px" onclick="searchCnpj('${c}')">${fCnpj(c)}</span>`).join('')}
+        ${!inv.cnpjs.length?'<span class="text-xs text-muted">Nenhum CNPJ</span>':''}
+      </div>
+    </div>`).join('');
+}
+function crossFromInv(csv){
+  crossList=csv.split(',').slice(0,10);
+  renderChips();
+  showPanel('cross');
+  doCross();
+}
+function openInvModal(){ document.getElementById('modal-inv').style.display='flex'; setTimeout(()=>document.getElementById('inv-name').focus(),50); }
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+async function createInv(){
+  const name=document.getElementById('inv-name').value.trim();
+  const desc=document.getElementById('inv-desc').value.trim();
+  if(!name){ toast('Nome obrigatório','error'); return; }
+  const r=await fetch('/api/investigations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,description:desc})});
+  const d=await r.json();
+  if(r.ok){ toast('Investigação criada','success'); closeModal('modal-inv'); loadInvestigations(); }
+  else toast(d.message||'Erro','error');
+}
+async function delInv(id){
+  if(!confirm('Excluir investigação?')) return;
+  const r=await fetch(`/api/investigations/${id}`,{method:'DELETE'});
+  if(r.ok){ toast('Removida','info'); loadInvestigations(); }
+  else toast('Erro','error');
+}
+
+/* ═══ HISTORY ══════════════════════════════════════════════════════════ */
+async function loadHistory(){
+  const c=document.getElementById('history-list');
+  c.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await fetch('/api/history?limit=50');
+    const d=await r.json();
+    if(r.ok&&d.status==='ok') renderHistory(c,d.data);
+    else c.innerHTML='<div class="empty"><p>Erro</p></div>';
+  } catch(e){ c.innerHTML='<div class="empty"><p>Erro</p></div>'; }
+}
+function renderHistory(c,data){
+  if(!data.length){ c.innerHTML='<div class="empty"><p>Nenhuma busca realizada</p></div>'; return; }
+  const lbl={cnpj:'CNPJ',name:'Nome',socio:'Sócio'};
+  c.innerHTML=`<div class="card"><div class="tbl-wrap"><table>
+    <thead><tr><th>Tipo</th><th>Consulta</th><th>Resultado</th><th>Data</th><th></th></tr></thead>
+    <tbody>${data.map(h=>`<tr>
+      <td><span class="badge badge-blue">${lbl[h.query_type]||h.query_type}</span></td>
+      <td class="mono">${h.query}</td>
+      <td class="truncate" style="max-width:160px">${h.result_nome||'—'}</td>
+      <td class="mono" style="font-size:10px">${h.searched_at ? new Date(h.searched_at).toLocaleString('pt-BR') : '—'}</td>
+      <td>${h.query_type==='cnpj'?`<button class="btn btn-ghost btn-xs" onclick="searchCnpj('${h.query}')">↗</button>`:'—'}</td>
+    </tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+async function clearHistory(){
+  if(!confirm('Limpar histórico?')) return;
+  const r=await fetch('/api/history',{method:'DELETE'});
+  if(r.ok){ toast('Histórico limpo','info'); loadHistory(); }
+}
+
+/* ═══ AUTH ═════════════════════════════════════════════════════════════ */
+async function doLogout(){
+  await fetch('/api/auth/logout',{method:'POST'});
+  location.href='/login';
+}
+
+/* ═══ TOAST ════════════════════════════════════════════════════════════ */
+function toast(msg, type='info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=type; el.style.display='block';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.style.display='none',4000);
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') ['modal-inv'].forEach(closeModal); });
+</script>
+</body>
+</html>
